@@ -61,7 +61,7 @@ Six layers, each only talking to the layer directly above or below it — so, fo
 ```bash
 # 1. Clone the repository
 git clone https://github.com/ishitadudhal/WarehouseManagement.git
-cd WarehouseManagement/WMS
+cd WarehouseManagement
 
 # 2. Create and activate a virtual environment
 python -m venv venv
@@ -127,6 +127,24 @@ Four tables, matching the physical warehouse (2 layers, 7 rows, 8 columns → 11
 ## Real machine integration (in progress)
 
 The physical warehouse in the lab is controlled by a Siemens PLC exposing an OPC UA server (documented in Y. Ubben's 2025 master's thesis, Hochschule Emden/Leer). `app/logic/machine_interface.py` is written against that real, documented node structure (`Einlagern`, `Auslagern`, safety checks) but is not yet connected — it needs the server's real IP address, to be set in `.env` as `OPCUA_ENDPOINT_URL`.
+
+## Local OPC UA test server
+
+Run the test server in a separate terminal to exercise the machine interface
+without access to the physical warehouse:
+
+```bash
+python opcua_test_server.py
+```
+
+For local testing, set this endpoint in `.env`:
+
+```text
+OPCUA_ENDPOINT_URL=opc.tcp://127.0.0.1:4840/wms-test/server/
+```
+
+The server exposes the documented `Lager` hierarchy with writable command
+variables, control enabled by default, and clear emergency-stop/collision flags.
 
 ## Status
 

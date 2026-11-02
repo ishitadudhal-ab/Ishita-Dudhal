@@ -70,18 +70,24 @@ class MachineInterface:
     def __init__(self, endpoint_url=ENDPOINT_URL):
         self.endpoint_url = endpoint_url
         self.client = None
+        self.namespace_index = None
 
     def connect(self):
         self.client = Client(self.endpoint_url)
         self.client.connect()
+        self.namespace_index = self.client.get_namespace_index(NAMESPACE_URI)
 
     def disconnect(self):
         if self.client:
             self.client.disconnect()
+            self.client = None
+            self.namespace_index = None
 
     def _get_node(self, key):
-        path = NODE_PATHS[key]
-        return self.client.get_node(path)
+        path = NODE_PATHS[key].split('/')
+        return self.client.get_objects_node().get_child(
+            [f'{self.namespace_index}:{part.split(":", 1)[1]}' for part in path[1:]]
+        )
 
     def is_control_enabled(self):
         """Checks the 'Steuerung Ein' (Control Enabled) flag before sending any command."""
